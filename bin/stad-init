@@ -23,18 +23,22 @@ DEFAULT_SIZE="1G"
 DEFAULT_FSTYPE="ext4"
 
 function get_stad_filename {
-    # Takes the directory as an argument and returns a .stad filename
+    # Takes the directory as an argument and returns a .stad filename; the
+    # stadpath.
 
-    # Make sure that there is a trailing '/'
-    #dir=$(echo "$1" | sed "s/\/$//" | sed "s/$/\//")
-    #filename=$(echo "$1" | sed "s/\/$//" | sed "s/$/\//" | grep -oP "/[^/]+/$" | sed "s/\///g")
-    #dir=$(echo "$1" | sed "s/$filename$//")
-    #echo "$dir$filename.stad"
     echo "$1.stad"
 }
 
-function create_empty_img {
+function get_stad_name {
+    # Get only the name
+
+    filename=$(echo "$1" | sed "s/\/$//" | sed "s/$/\//" | grep -oP "/[^/]+/$" | sed "s/\///g")
+    echo $filename
+}
+
+function create_img {
     # Create a blank image $2 of $1 size
+    # create_img SIZE STADPATH FSTYPE
     unit="${1: -1}"
     if [ "$unit" == "M" ]; then
         factor="1"
@@ -46,9 +50,21 @@ function create_empty_img {
     fi
     count=${1%?}
     count=$(($count * $factor))
-    echo $count
 
+    echo "Creating stad image..."
     dd if=/dev/zero of=$2 iflag=fullblock bs=1M count=$count
+
+    echo "Creating LUKS container..."
+    cryptsetup luksFormat $2
+
+    echo "Opening LUKS container for filesystem creation..."
+    mappername="stad-$(get_stad_name $2)"
+    echo $mappername
+    sudo cryptsetup luksOpen $2 stad-$(get_stad_name $2)
+    echo "Creating fs..."
+    sudo mkfs -t $3 "/dev/mapper/$mappername"
+    echo "Closing LUKS container..."
+    sudo cryptsetup close "/dev/mapper/$mappername"
 }
 
 # Parse the arguments
@@ -94,5 +110,7 @@ if [ -z $DIRECTORY ]; then
 fi
 
 echo $DIRECTORY
-echo $(get_stad_filename $DIRECTORY)
-echo $(create_img $SIZE)
+STADPATH=$(get_stad_filename $DIRECTORY)
+echo $SIZE
+echo $STADPATH
+create_img $SIZE $STADPATH $FSTYPE
