@@ -1,0 +1,98 @@
+#!/bin/bash
+
+# stad-init
+# Copyright (c) 2018 Martijn
+#
+# This file is part of stad-encryption.
+#
+# stad-encryption is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# stad-encryption is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with stad-encryption.  If not, see <http://www.gnu.org/licenses/>.
+
+# Default variables
+DEFAULT_SIZE="1G"
+DEFAULT_FSTYPE="ext4"
+
+function get_stad_filename {
+    # Takes the directory as an argument and returns a .stad filename
+
+    # Make sure that there is a trailing '/'
+    #dir=$(echo "$1" | sed "s/\/$//" | sed "s/$/\//")
+    #filename=$(echo "$1" | sed "s/\/$//" | sed "s/$/\//" | grep -oP "/[^/]+/$" | sed "s/\///g")
+    #dir=$(echo "$1" | sed "s/$filename$//")
+    #echo "$dir$filename.stad"
+    echo "$1.stad"
+}
+
+function create_empty_img {
+    # Create a blank image $2 of $1 size
+    unit="${1: -1}"
+    if [ "$unit" == "M" ]; then
+        factor="1"
+    elif [ "$unit" == "G" ]; then
+        factor="1000"
+    elif [ "$unit" == "T" ]; then
+        factor="1000000"
+        # I hope nobody actually makes a stad this big
+    fi
+    count=${1%?}
+    count=$(($count * $factor))
+    echo $count
+
+    dd if=/dev/zero of=$2 iflag=fullblock bs=1M count=$count
+}
+
+# Parse the arguments
+POSITIONAL=()
+while [[ $# -gt 0 ]]
+do
+key="$1"
+
+case $key in
+    -d|--directory)
+    DIRECTORY="$2"
+    shift
+    shift
+    ;;
+    -s|--size)
+    SIZE="$2"
+    shift
+    shift
+    ;;
+    -t|--fstype)
+    FSTYPE="$2"
+    shift
+    shift
+    ;;
+    *)  # Unknown argument
+    POSITIONAL+=("$1")
+    shift
+    ;;
+esac
+done
+
+if [ -z $FSTYPE ]; then
+    FSTYPE=$DEFAULT_FSTYPE
+fi
+
+if [ -z $SIZE ]; then
+    SIZE=$DEFAULT_SIZE
+fi
+
+if [ -z $DIRECTORY ]; then
+    (>&2 echo "No directory given.")
+    exit 1
+fi
+
+echo $DIRECTORY
+echo $(get_stad_filename $DIRECTORY)
+echo $(create_img $SIZE)
