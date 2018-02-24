@@ -1,6 +1,9 @@
 #!/bin/bash
 
 # stad-init
+# Usage:
+#       stad-init -d ~/foo -s 1G [-t fstype]
+#
 # Copyright (c) 2018 Martijn
 #
 # This file is part of stad-encryption.
@@ -22,15 +25,15 @@
 DEFAULT_SIZE="1G"
 DEFAULT_FSTYPE="ext4"
 
-function get_stad_filename {
+function get_stad_path {
     # Takes the directory as an argument and returns a .stad filename; the
-    # stadpath.
+    # stad path.
 
     echo "$1.stad"
 }
 
 function get_stad_name {
-    # Get only the name
+    # Get only the stad name
 
     filename=$(echo "$1" | sed "s/\/$//" | sed "s/$/\//" | grep -oP "/[^/]+/$" | sed "s/\///g")
     echo $filename
@@ -109,8 +112,6 @@ if [ -z $DIRECTORY ]; then
     exit 1
 fi
 
-echo $DIRECTORY
-STADPATH=$(get_stad_filename $DIRECTORY)
-echo $SIZE
+STADPATH=$(get_stad_path $DIRECTORY)
 echo $STADPATH
 create_img $SIZE $STADPATH $FSTYPE
