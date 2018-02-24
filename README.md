@@ -12,6 +12,7 @@ Q&A
 ---
 
 Q: Why would you use this instead of just using LUKS?
+
 A: Sometimes you need more flexible encrypted directories, and/or making a new partition
 for LUKS-encrypted data is not the ideal solution. Furthermore, STAD is made for files
 which aren't always in use by the system. When they're not used, you can simple close
@@ -20,6 +21,7 @@ using LUKS only provides offline protection; once the system is running all data
 accessible.
 
 Q: Is it secure?
+
 A: STAD should be just as secure as any other LUKS-encrypted volume. Be sure to use a
 strong and unique passphrase.
 
