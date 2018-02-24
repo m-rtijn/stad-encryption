@@ -1,0 +1,3 @@
+bin/stad-init usr/bin
+bin/stad-open usr/bin
+bin/stad-close usr/bin
