@@ -1,7 +1,9 @@
 stad-encryption
 ===============
 
-With STAD-encryption (Secure and Transparant Arbitrary Directory Encryption) you can
+stad-encryption enables LUKS-based partitionless folder encryption.
+
+With stad-encryption (Secure and Transparant Arbitrary Directory Encryption) you can
 easily use LUKS to encrypt only a specific folder and mount it only when necessary.
 When the data is not used, one can simply unmount the LUKS-encrypted image to be sure
 that the data cannot be accessed by unauthorized users or programs. It also enables users
@@ -36,12 +38,12 @@ For example, we want to encrypt the folder `~/secret/`.
 stad-init -d ~/secret -s 1G [-t fstype]
 ```
 While the script runs, it asks us to entry an encryption passphrase by cryptsetup. This
-creates a 1GiB ~/.secret.stad file; this is the image where your data is actually stored,
+creates a 1GiB ~/secret.stad file; this is the image where your data is actually stored,
 so be sure to back it up!
 
 To open the folder, we run:
 ```
-stad-open ~/.secret.stad
+stad-open ~/secret
 ```
 Which will prompt us for our passphrase and mounts our directory on `~/secret`.
 
