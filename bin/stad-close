@@ -1,0 +1,57 @@
+#!/bin/bash
+
+# stad-close
+# Usage:
+#       stad-close ~/foo
+#
+# Copyright (c) 2018 Martijn
+#
+# This file is part of stad-encryption.
+#
+# stad-encryption is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# stad-encryption is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with stad-encryption.  If not, see <http://www.gnu.org/licenses/>.
+
+function get_stad_path {
+    # Takes the directory as an argument and returns a .stad filename; the
+    # stad path.
+
+    echo "$1.stad"
+}
+
+function get_stad_name {
+    # Get only the stad name
+
+    filename=$(echo "$1" | sed "s/\/$//" | sed "s/$/\//" | grep -oP "/[^/]+/$" | sed "s/\///g")
+    echo $filename
+}
+
+DIRPATH="$1"
+STADPATH=$(get_stad_path $DIRPATH)
+STADNAME=$(get_stad_name $DIRPATH)
+
+if [ ! -f $STADPATH ]; then
+    (>&2 echo "No stad file found")
+    exit 1
+fi
+
+if [ ! -d $DIRPATH ]; then
+    echo "Directory does not exist yet, creating $DIRPATH..."
+    mkdir -p $DIRPATH
+fi
+
+# Todo: merge stad-close and stad-open into one file
+MAPPERNAME="stad-$STADNAME"
+echo "Unmounting..."
+sudo umount $DIRPATH
+echo "Closing LUKS container..."
+sudo cryptsetup close /dev/mapper/$MAPPERNAME
