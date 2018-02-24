@@ -8,15 +8,30 @@ that the data cannot be accessed by unauthorized users or programs. It also enab
 who don't want to encrypt their whole computer or home directory to encrypt just a
 specific folder.
 
+Q&A
+---
+
+Q: Why would you use this instead of just using LUKS?
+A: Sometimes you need more flexible encrypted directories, and/or making a new partition
+for LUKS-encrypted data is not the ideal solution. Furthermore, STAD is made for files
+which aren't always in use by the system. When they're not used, you can simple close
+the STAD folder to make sure that no other process can read it. Full disk encryption
+using LUKS only provides offline protection; once the system is running all data is
+accessible.
+
+Q: Is it secure?
+A: STAD should be just as secure as any other LUKS-encrypted volume. Be sure to use a
+strong and unique passphrase.
+
 How it works
 ------------
 
 STAD is a toolkit consisting of several neat bash scripts. It is based on LUKS encrypted
 image files.
 
-For exmaple, we want to encrypt the folder `~/secret/`.
+For example, we want to encrypt the folder `~/secret/`.
 ```
-stad-init ~/secret -s 1G [-t fstype]
+stad-init -d ~/secret -s 1G [-t fstype]
 ```
 While the script runs, it asks us to entry an encryption passphrase by cryptsetup. This
 creates a 1GiB ~/.secret.stad file; this is the image where your data is actually stored,
