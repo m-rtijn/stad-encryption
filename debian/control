@@ -1,0 +1,14 @@
+Source: stad-encryption
+Maintainer: Martijn <mrtijn@riseup.net>
+Section: admin
+Priority: optional
+Standards-Version: 3.9.6
+Build-Depends: debhelper (>= 9)
+
+Package: stad-encryption
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, cryptsetup
+Description: LUKS-based partitionless folder encryption
+ stad-encryption makes it easy to encrypt separate folders with LUKS, without
+ the need for new partitions. This has the extra benefit of being able to easily
+ unmount only a specific folder with sensitive data when it is not in use.
